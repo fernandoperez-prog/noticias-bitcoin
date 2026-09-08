@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Panel de Noticias - Bitcoin</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, Helvetica, sans-serif;
+    background: #0b0d12;
+    color: #e6e6e6;
+    margin: 0;
+  }
+  .wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px 60px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 44px 0 28px;
+  }
+  header .icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(247,147,26,0.18), rgba(247,147,26,0.05));
+    border: 1px solid rgba(247,147,26,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  header .icon-wrap svg { width: 26px; height: 26px; stroke: #f7931a; }
+  header h1 {
+    font-size: 26px;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #8a8f9a;
+  }
+
+  /* ---------- Estado de carga ---------- */
+  #estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #8a8f9a;
+    padding: 100px 0;
+    font-size: 14px;
+  }
+  #estado svg { width: 18px; height: 18px; stroke: #8a8f9a; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Sección destacada ---------- */
+  .destacada {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #1f232c;
+    height: 380px;
+    margin-bottom: 40px;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .destacada img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+  .destacada:hover img { transform: scale(1.04); }
+  .destacada .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.05) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32px;
+  }
+  .destacada .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    background: #f7931a;
+    color: #0b0d12;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+  }
+  .destacada .tag svg { width: 12px; height: 12px; stroke: #0b0d12; }
+  .destacada h2 {
+    font-size: 28px;
+    line-height: 1.25;
+    margin: 0 0 12px;
+    max-width: 780px;
+    font-weight: 700;
+  }
+  .destacada .meta {
+    display: flex;
+    gap: 18px;
+    font-size: 13px;
+    color: #c8ccd4;
+  }
+  .destacada .meta span { display: flex; align-items: center; gap: 6px; }
+  .destacada .meta svg { width: 14px; height: 14px; stroke: #c8ccd4; }
+
+  /* ---------- Grid secciÃ³n ---------- */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #8a8f9a;
+    margin-bottom: 20px;
+  }
+  .section-label svg { width: 15px; height: 15px; stroke: #f7931a; }
+  .section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #1f232c;
+  }
+
+  #contenedor {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .card {
+    background: #14161c;
+    border: 1px solid #1f232c;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .card:hover {
+    border-color: #f7931a55;
+    transform: translateY(-3px);
+  }
+  .card .thumb {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    background: #1a1d24;
+  }
+  .card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .card-body h3 {
+    font-size: 16px;
+    line-height: 1.45;
+    margin: 0 0 14px;
+    font-weight: 600;
+    min-height: 46px;
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 12.5px;
+    color: #8a8f9a;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #1f232c;
+  }
+  .meta span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .meta svg {
+    width: 14px;
+    height: 14px;
+    stroke: #6b7280;
+    flex-shrink: 0;
+  }
+  .btn {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: #f7931a;
+    color: #0b0d12;
+    text-decoration: none;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13.5px;
+    transition: filter 0.15s ease;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn svg { width: 15px; height: 15px; stroke: #0b0d12; }
+
+  @media (max-width: 900px) {
+    #contenedor { grid-template-columns: repeat(2, 1fr); }
+    .destacada h2 { font-size: 22px; }
+    .destacada { height: 320px; }
+  }
+  @media (max-width: 600px) {
+    #contenedor { grid-template-columns: 1fr; }
+    .wrap { padding: 0 18px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+        <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Panel de Noticias — Bitcoin</h1>
+      <p>Últimas actualizaciones vía NewsAPI</p>
+    </div>
+  </header>
+
+  <p id="estado">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+    </svg>
+    Cargando noticias...
+  </p>
+
+  <div id="destacada-wrap"></div>
+
+  <div id="grid-wrap" style="display:none;">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Más noticias
+    </div>
+    <div id="contenedor"></div>
+  </div>
+</div>
+
+<script>
+  const IMG_DEFECTO = "https://via.placeholder.com/600x400?text=Sin+imagen";
+
+  function formatearFecha(iso) {
+    if (!iso) return "";
+    return new Date(iso).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  const iconFuente = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>`;
+  const iconFecha  = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
+  const iconFlecha = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>`;
+  const iconDestacada = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6Z"/></svg>`;
+
+  async function cargarNoticias() {
+    const estado = document.getElementById("estado");
+    const destacadaWrap = document.getElementById("destacada-wrap");
+    const gridWrap = document.getElementById("grid-wrap");
+    const contenedor = document.getElementById("contenedor");
+
+    try {
+      const res = await fetch("/api/noticias");
+      const noticias = await res.json();
+
+      if (!Array.isArray(noticias) || noticias.length === 0) {
+        estado.textContent = "No se encontraron noticias.";
+        return;
+      }
+
+      estado.remove();
+
+      const [primera, ...resto] = noticias;
+
+      // ----- Noticia destacada -----
+      const imgDestacada = primera.urlToImage ? primera.urlToImage : IMG_DEFECTO;
+      const fuenteDestacada = primera.source && primera.source.name ? primera.source.name : "Desconocida";
+      destacadaWrap.innerHTML = `
+        <a class="destacada" href="${primera.url}" target="_blank" rel="noopener">
+          <img src="${imgDestacada}" alt="${primera.title}" onerror="this.src='${IMG_DEFECTO}'">
+          <div class="overlay">
+            <span class="tag">${iconDestacada} Destacada</span>
+            <h2>${primera.title}</h2>
+            <div class="meta">
+              <span>${iconFuente} ${fuenteDestacada}</span>
+              <span>${iconFecha} ${formatearFecha(primera.publishedAt)}</span>
+            </div>
+          </div>
+        </a>
+      `;
+
+      // ----- Grid del resto -----
+      resto.forEach((n) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const imagen = n.urlToImage ? n.urlToImage : IMG_DEFECTO;
+        const fecha = formatearFecha(n.publishedAt);
+        const fuente = n.source && n.source.name ? n.source.name : "Desconocida";
+
+        card.innerHTML = `
+          <img class="thumb" src="${imagen}" alt="${n.title}" onerror="this.src='${IMG_DEFECTO}'">
+          <div class="card-body">
+            <h3>${n.title}</h3>
+            <div class="meta">
+              <span>${iconFuente} ${fuente}</span>
+              <span>${iconFecha} ${fecha}</span>
+            </div>
+            <a class="btn" href="${n.url}" target="_blank" rel="noopener">
+              Leer más ${iconFlecha}
+            </a>
+          </div>
+        `;
+        contenedor.appendChild(card);
+      });
+
+      gridWrap.style.display = "block";
+    } catch (err) {
+      estado.textContent = "Error al cargar noticias.";
+      console.error(err);
+    }
+  }
+
+  cargarNoticias();
+</script>
+
+</body>
+</html>
